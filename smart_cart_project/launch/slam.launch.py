@@ -11,7 +11,7 @@ def generate_launch_description():
         name='sllidar_node',
         parameters=[{
             'channel_type': 'serial',
-            'serial_port': '/dev/ttyUSB1',  # 'ls /dev/ttyUSB*'로 확인한 번호 넣기
+            'serial_port': '/dev/ttyUSB0',  # 'ls /dev/ttyUSB*'로 확인한 번호 넣기
             'serial_baudrate': 115200,
             'frame_id': 'laser',
             'inverted': False,

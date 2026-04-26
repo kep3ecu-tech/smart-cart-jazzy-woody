@@ -39,8 +39,8 @@ class MotorNode(Node):
         right_speed = msg.linear.x + msg.angular.z
 
         # 앞/뒤 왼쪽 모터 제어
-        self.set_motor(self.front_left_pwm, self.front_left_in1, self.front_left_in2, left_speed)
-        self.set_motor(self.back_left_pwm, self.back_left_in1, self.back_left_in2, left_speed)
+        self.set_motor(self.front_left_pwm, self.front_left_in2, self.front_left_in1, left_speed)
+        self.set_motor(self.back_left_pwm, self.back_left_in2, self.back_left_in1, left_speed)
         
         # 앞/뒤 오른쪽 모터 제어
         self.set_motor(self.front_right_pwm, self.front_right_in1, self.front_right_in2, right_speed)

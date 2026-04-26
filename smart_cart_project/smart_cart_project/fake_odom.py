@@ -1,0 +1,51 @@
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Twist, TransformStamped
+from tf2_ros import TransformBroadcaster
+import math
+
+class FakeOdomNode(Node):
+    def __init__(self):
+        super().__init__(\"fake_odom_node\")
+        self.br = TransformBroadcaster(self)
+        self.sub = self.create_subscription(Twist, \"/cmd_vel_safe\", self.cmd_callback, 10)
+        self.timer = self.create_timer(0.05, self.timer_callback)
+        self.x = 0.0
+        self.y = 0.0
+        self.yaw = 0.0
+        self.vx = 0.0
+        self.vth = 0.0
+        self.last_time = self.get_clock().now()
+
+    def cmd_callback(self, msg):
+        self.vx = msg.linear.x
+        self.vth = msg.angular.z
+
+    def timer_callback(self):
+        now = self.get_clock().now()
+        dt = (now - self.last_time).nanoseconds / 1e9
+        self.last_time = now
+
+        # Simple integration
+        self.x += self.vx * math.cos(self.yaw) * dt
+        self.y += self.vx * math.sin(self.yaw) * dt
+        self.yaw += self.vth * 1.0 * dt
+
+        t = TransformStamped()
+        t.header.stamp = now.to_msg()
+        t.header.frame_id = \"odom\"
+        t.child_frame_id = \"base_link\"
+        t.transform.translation.x = self.x
+        t.transform.translation.y = self.y
+        t.transform.rotation.z = math.sin(self.yaw / 2.0)
+        t.transform.rotation.w = math.cos(self.yaw / 2.0)
+        self.br.sendTransform(t)
+
+def main():
+    rclpy.init()
+    node = FakeOdomNode()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+if __name__ == \"__main__\":
+    main()
